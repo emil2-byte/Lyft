@@ -237,7 +237,6 @@ function baseSuggest(exk,lane){
   if(cap!=null && kgv>cap) kgv=cap;
   return rg(Math.max(ex.min,kgv),ex.grid);
 }
-function capReached(){ return false; }
 function trainingMax(exk){
   var b=bestEpley(exk); if(!b) return null;
   return rg(b*0.95,EX[exk].grid);
@@ -414,7 +413,7 @@ function nextFor(b){
     return "hold "+kg(w0)+" — get "+top+" reps on every set";
   }
   var w=blockKg(b);
-  if(/Wave$/.test(b.lane)) return "the training max follows your top sets";
+  if(/Wave$/.test(b.lane)) return "hit all "+b.reps+" reps and your training max rises on its own";
   if(b.derived && b.derived.tm) return b.sub+": "+Math.round(b.factor*100)+"% of your "+EX[b.derived.tm].name.toLowerCase()+" training max";
   if(b.derived) return b.sub+": "+Math.round(b.factor*100)+"% of your "+EX[b.derived.from].name.toLowerCase()+" work weight";
   var cap=phaseCap(b.ex,S.settings.phase);
@@ -546,7 +545,8 @@ function renderToday(){
                     : (tmp[b.lane]!=null? tmp[b.lane] : blockKg(b));
     var repDefault = b.kind==="band"? b.reps[0] : (b.kind==="reps"? pullupTarget() : b.reps);
     var repv = tmp[b.lane+"_r"]!=null? tmp[b.lane+"_r"] : repDefault;
-    var planned = isBW? (repv+" reps"+(kgv>0?" +"+kg(kgv):"")) : (fmt(kgv)+"×"+repv);
+    var planned = isBW? (repv+" reps"+(kgv>0?" +"+kg(kgv):""))
+                       : (fmt(kgv)+"×"+(b.kind==="amrap"? "AMRAP" : repv));
     h+='<div class="card" data-bi="'+bi+'">';
     h+='<div class="srow"><div class="ex">'+ex.name+(b.sub?' <span class="tag">'+b.sub+'</span>':'')+'</div><div class="tag">'+b.sets+(b.sets===1?' set':' sets')+'</div></div>';
     h+='<div class="scheme">'+schemeLabel(b)+' &middot; '+(isBW? (kgv>0? kg(kgv)+" added":"bodyweight") : kg(kgv))+'</div>';
@@ -607,7 +607,7 @@ function phaseHint(){
       var w=baseSuggest(k,k), cap=phaseCap(k,"recovery");
       if(w>=cap-0.01){ ready++; txt.push(EX[k].name+" "+kg(w)); }
     });
-    if(ready>=2) return {next:"build",text:"Squat, bench and deadlift have climbed to their recovery ceiling ("+txt.join(", ")+"). The rebound is done — now split the days so you are not maxing everything on the same day, put an AMRAP on the last set of the heavy lift, and bring in the assistance work."};
+    if(ready>=2) return {next:"build",text:txt.join(" and ")+" are back at the ceiling for this phase. The rebound is done — split the days so you are not taking max effort on everything at once, put an AMRAP on the last set of the heavy lift, and bring in the assistance work."};
     return null;
   }
   if(ph==="build"){
@@ -668,7 +668,7 @@ function renderLifts(){
     h+='<tr><td><b>'+EX[k].name+'</b><br><span class="note">'+chart(k)+'</span></td><td>'+kg(r)+'</td><td>'+kg(rg(b,1))+'<div class="note">best set '+bestSetLabel(k)+'</div></td><td>'+(p>=100?'<span style="color:var(--ok)">+'+(p-100)+'%</span>':p+'%')+'</td></tr>';
   });
   h+='</table><div class="note" style="margin-top:8px">Estimated 1RM from your best logged set (Epley). Your old numbers are what you had before the break — set them in Settings.</div></div>';
-  h+='<h2>Pull-ups</h2><div class="card"><div class="note">Target '+pullupTarget()+' reps per set'+((S.w.pullupKg||0)>0?", "+kg(S.w.pullupKg)+" added":"")+'. Best set: <b>'+bestPullupReps()+' reps</b>. When you can do '+S.settings.bodyweight+' kg bodyweight + 3 x 8 clean, add load.</div></div>';
+  h+='<h2>Pull-ups</h2><div class="card"><div class="note">Target '+pullupTarget()+' reps per set'+((S.w.pullupKg||0)>0?", "+kg(S.w.pullupKg)+" added":"")+'. Best set: <b>'+bestPullupReps()+' reps</b>. Hit all three sets and the target climbs one rep; at 8 reps it drops back to 3x5 and starts adding 2.5 kg instead. Miss a set and the target comes back down one.</div></div>';
   h+='<h2>Working weights</h2><div class="card"><table><tr><th>Lane</th><th>Now</th><th>History</th></tr>';
   ["squat","bench","deadlift"].forEach(function(k){
     var recs=laneRecs(k).slice(-6).map(function(r){return r.kg;});
