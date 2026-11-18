@@ -101,6 +101,8 @@ puts it back.
 
 ## Testing
 
-`node test_engine.js` (in the folder above the app) runs the app's own plan/progression code
-in Node and prints month after month of sessions — the weight jumps, the phase ceilings, the
-deloads and the 5/3/1 wave — so the rules can be checked without tapping through the phone.
+`cd dev && node test_engine.js` runs the app's own plan/progression code in Node and prints
+month after month of sessions — the weight jumps, the phase ceilings, the deloads and the
+5/3/1 wave — so the rules can be checked without tapping through the phone. It also writes a
+`state.json` (a full simulated log) that you can paste into the app through
+Settings → Backup → Paste & restore if you want to see what a finished block looks like.
