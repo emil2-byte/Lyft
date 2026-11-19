@@ -1,6 +1,6 @@
 /* Lyft service worker: cache first, so the app opens at the gym with no signal.
    The log itself lives in the page's localStorage, never in the cache. */
-const V = "lyft-v1.0";
+const V = "lyft-v1.1";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
